@@ -15,8 +15,6 @@ class OwnerScope implements Scope
         if (Auth::check()) {
             $builder->where('user_id', Auth::user()->id);
             // $builder->where('user_id', 'hamburger');
-        } else {
-            // TODO: nega accesso a utenti non loggati
         }
     }
 }

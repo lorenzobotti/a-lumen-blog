@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-
-    // use OwnerScope;
     /**
      * Create a new controller instance.
      *
@@ -28,10 +26,15 @@ class PostController extends Controller
      *
      */
     public function showAllUsers() {
-        return response()->json(User::all());
+        return User::all();
     }
 
     public function createPost(Request $request) {
+        $this->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+        ]);
+
         $user = Auth::user();
 
         $title = $request->input('title');
@@ -54,17 +57,16 @@ class PostController extends Controller
     }
 
     public function deletePost(int $id) {
-//        $user = Auth::user();
+        $user = Auth::user();
 
         $post = Post::find($id);
         if (!$post) {
             return new Response('', 404);
         }
 
-        // non serve perché c'è OwnerScope
-//        if ($post->user_id != $user->id) {
-//            return new Response('', 401);
-//        }
+        if ($post->user_id != $user->id) {
+            return new Response('', 401);
+        }
 
         $post->delete();
     }

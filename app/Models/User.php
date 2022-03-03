@@ -35,11 +35,6 @@ class User extends Model {
         return $this->hasMany('App\Models\Comment');
     }
 
-//    public function scopeIsPremium(Builder $query) {
-//        $query->where('subscription', 'premium');
-//    }
-
-    // TODO: molto imperativo, probabilmente non la soluzione migliore
     public function isPremium(int $id): bool
     {
         return $this->subscription === 'premium';

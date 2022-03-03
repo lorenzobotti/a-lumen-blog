@@ -22,9 +22,11 @@ class CommentController extends Controller
         //
     }
 
-
-
     public function createComment(Request $request) {
+        $this->validate([
+            'content' => 'required|string',
+        ]);
+
         $user = Auth::user();
 
         $comment = new Comment();
@@ -51,6 +53,10 @@ class CommentController extends Controller
     }
 
     public function editComment(int $id, Request $request) {
+        $this->validate([
+            'content' => 'required|string',
+        ]);
+
         // non dobbiamo controllare che l'utente sia premium perché ci pensa
         // già PremiumMiddleware
         $user = Auth::user();
