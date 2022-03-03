@@ -38,7 +38,7 @@ class UserController extends Controller
 
     public function login(Request $request) {
         $this->validate($request, [
-            'email' => 'requires|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
@@ -81,13 +81,18 @@ class UserController extends Controller
 
     public function create(Request $request) {
         $this->validate($request, [
-            'email' => 'requires|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
         $fields = $request->all();
-        $fields['api_token'] = TokenGenerator::generateRandomString(64);
-        $user = User::create($fields);
+        $user = new User();
+        $user->fill($fields);
+        $user['api_token'] = TokenGenerator::generateRandomString(64);
+        $saved = $user->save();
+        if (!$saved) {
+            return new Response('', 500);
+        }
         return $user;
     }
 }
