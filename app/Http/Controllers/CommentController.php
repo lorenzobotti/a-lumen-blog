@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Scopes\OwnerScope;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Post;
@@ -27,20 +28,21 @@ class CommentController extends Controller
         $user = Auth::user();
 
         $comment = new Comment();
+        $comment->fill($request->all());
 
-
-        $comment.fill($request->all());
         $comment['post_id'] = $request->input('post_id');
+        $comment['user_id'] = $user['id'];
 
-        return Comment::create([
-            'content' => $content,
-            'post_id' => $post_id,
-            'user_id' => $user['id'],
-        ]);
+        $saved = $comment->save();
+        if (!$saved) {
+            return new Response('', 500);
+        }
+
+        return $comment;
     }
 
     public function getCommentById(int $id) {
-        $comment = Comment::with([])->find($id)->first();
+        $comment = Comment::find($id)->first();
         if (!$comment) {
             return new Response('', 404);
         }
@@ -49,15 +51,21 @@ class CommentController extends Controller
     }
 
     public function editComment(int $id, Request $request) {
+        // non dobbiamo controllare che l'utente sia premium perché ci pensa
+        // già PremiumMiddleware
         $user = Auth::user();
+
         $comment = Comment::find($id);
         if (!$comment) {
             return new Response('', 404);
         }
 
-        if ($comment['user_id'] !== $user['id']) {
+        $author = User::find($user['id']);
+        $isAuthor = $author['id'] === $comment['user_id'];
+        if (!$isAuthor) {
             return new Response('', 401);
         }
+
 
         $comment->update($request->all());
         return $comment;

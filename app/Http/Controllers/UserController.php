@@ -28,10 +28,15 @@ class UserController extends Controller
     }
 
     public function getById($id) {
-        return response()->json(User::find($id)->first());
+        return response()->json(User::find($id));
     }
 
     public function login(Request $request) {
+        $this->validate($request, [
+            'email' => 'requires|email',
+            'password' => 'required',
+        ]);
+
         $email = $request->input('email');
         $password = $request->input('password');
 
@@ -48,6 +53,21 @@ class UserController extends Controller
         return response()->json($user['api_token']);
     }
 
+    public function newToken(Request $request) {
+        $userId = Auth::user()['id'];
+
+        $newToken = TokenGenerator::generateRandomString(64);
+
+        $user = User::find($userId);
+        $user['api_token'] = $newToken;
+        $saved = $user->save();
+        if (!$saved) {
+            return new Response('', 500);
+        }
+
+        return $newToken;
+    }
+
 //    public function getByToken(string $token) {
 //        return response()->json(User::where('token', $token)->first());
 //    }
@@ -55,6 +75,11 @@ class UserController extends Controller
 
 
     public function create(Request $request) {
+        $this->validate($request, [
+            'email' => 'requires|email',
+            'password' => 'required',
+        ]);
+
         $fields = $request->all();
         $fields['api_token'] = TokenGenerator::generateRandomString(64);
         $user = User::create($fields);

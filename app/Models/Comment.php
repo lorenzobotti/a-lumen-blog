@@ -22,9 +22,9 @@ class Comment extends Model
         return $this->belongsTo('App\Models\Post');
     }
 
-    public static function boot() {
-        parent::boot();
-        static::addGlobalScope('OwnerScope');
-    }
+//    public static function boot() {
+//        parent::boot();
+//        static::addGlobalScope('OwnerScope');
+//    }
 
 }

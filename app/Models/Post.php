@@ -20,8 +20,8 @@ class Post extends Model
         return $this->hasMany('App\Models\Comment');
     }
 
-    public static function boot() {
-        parent::boot();
-        static::addGlobalScope(new OwnerScope);
-    }
+//    public static function boot() {
+//        parent::boot();
+//        static::addGlobalScope(new OwnerScope);
+//    }
 }

@@ -72,7 +72,7 @@ class PostController extends Controller
     public function getPostById(int $id)
     {
 
-        $post = Post::withoutGlobalScope(OwnerScope::class)->with(['user'])->find($id);
+        $post = Post::with(['user'])->find($id);
         if (!$post) {
             return new Response('', 404);
         }

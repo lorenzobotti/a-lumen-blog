@@ -27,8 +27,12 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
 
     $router->post('/comments', ['uses' => 'CommentController@createComment']);
-    $router->put('/comments/{id}', ['uses' => 'CommentController@editComment']);
-    $router->delete('/comments/{id}', ['uses' => 'CommentController@deleteComment']);
+
+    // area premium
+    $router->group(['middleware' => 'premium'], function () use ($router) {
+        $router->put('/comments/{id}', ['uses' => 'CommentController@editComment']);
+        $router->delete('/comments/{id}', ['uses' => 'CommentController@deleteComment']);
+    });
 });
 
 $router->get('/users/', ['uses' => 'UserController@showAllUsers']);
@@ -44,4 +48,8 @@ $router->get('/comments/{id}', ['uses' => 'CommentController@getCommentById']);
 $router->group(['prefix' => 'auth'], function () use ($router) {
     $router->post('/login', ['uses' => 'UserController@login']);
     $router->post('/register', ['uses' => 'UserController@create']);
+
+    $router->group(['middleware' => 'auth'], function() use ($router) {
+        $router->post('refresh', ['uses' => 'UserController@newToken']);
+    });
 });
