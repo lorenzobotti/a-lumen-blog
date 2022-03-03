@@ -22,8 +22,8 @@ $router->get('/', function () use ($router) {
 });
 
 
-
-$router->group(['middleware' => 'queries'], function () use ($router) {
+// scommenta per ricevere info sulle query eseguite nelle risposte
+// $router->group(['middleware' => 'queries'], function () use ($router) {
 
     // area protetta
     $router->group(['middleware' => 'auth'], function () use ($router) {
@@ -57,5 +57,5 @@ $router->group(['middleware' => 'queries'], function () use ($router) {
             $router->post('refresh', ['uses' => 'UserController@newToken']);
         });
     });
-});
+// });
 
