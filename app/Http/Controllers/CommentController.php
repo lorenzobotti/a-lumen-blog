@@ -23,7 +23,7 @@ class CommentController extends Controller
     }
 
     public function createComment(Request $request) {
-        $this->validate([
+        $this->validate($request, [
             'content' => 'required|string',
         ]);
 
@@ -53,20 +53,19 @@ class CommentController extends Controller
     }
 
     public function editComment(int $id, Request $request) {
-        $this->validate([
+        $this->validate($request, [
             'content' => 'required|string',
         ]);
 
         // non dobbiamo controllare che l'utente sia premium perché ci pensa
         // già PremiumMiddleware
-        $user = Auth::user();
+        $author = Auth::user();
 
         $comment = Comment::find($id);
         if (!$comment) {
             return new Response('', 404);
         }
 
-        $author = User::find($user['id']);
         $isAuthor = $author['id'] === $comment['user_id'];
         if (!$isAuthor) {
             return new Response('', 401);
