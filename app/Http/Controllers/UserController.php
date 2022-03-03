@@ -24,11 +24,16 @@ class UserController extends Controller
      *
      */
     public function showAllUsers() {
-        return response()->json(User::all());
+        return User::all();
     }
 
     public function getById($id) {
-        return response()->json(User::find($id));
+        $user = User::find($id);
+        if (!$user) {
+            return new Response('', 404);
+        }
+
+        return $user;
     }
 
     public function login(Request $request) {
@@ -50,7 +55,7 @@ class UserController extends Controller
             return new Response('', 401);
         };
 
-        return response()->json($user['api_token']);
+        return $user['api_token'];
     }
 
     public function newToken(Request $request) {
