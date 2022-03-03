@@ -17,9 +17,8 @@ class PremiumMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $userLogged = Auth::user();
-        $user = User::find($userLogged->id);
-        if (!$user->subscription == 'premium') {
+        $user = Auth::user();
+        if ($user->subscription !== 'premium') {
             return new Response('', 403);
         }
 

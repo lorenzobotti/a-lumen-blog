@@ -30,7 +30,7 @@ class PostController extends Controller
     }
 
     public function createPost(Request $request) {
-        $this->validate([
+        $this->validate($request, [
             'title' => 'required|string',
             'content' => 'required|string',
         ]);
@@ -83,6 +83,6 @@ class PostController extends Controller
 
     public function allPosts() {
         // eager loading
-        return Post::withoutGlobalScope(OwnerScope::class)->with(['user', 'comments', 'comments.user'])->get();
+        return Post::with(['user', 'comments', 'comments.user'])->get();
     }
 }
