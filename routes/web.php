@@ -26,7 +26,7 @@ $router->get('/', function () use ($router) {
 // $router->group(['middleware' => 'queries'], function () use ($router) {
 
     // area protetta
-    $router->group(['middleware' => 'auth'], function () use ($router) {
+    $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
         $router->post('/posts', ['uses' => 'PostController@createPost']);
         $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
 
@@ -41,7 +41,8 @@ $router->get('/', function () use ($router) {
 
     $router->get('/users/', ['uses' => 'UserController@showAllUsers']);
     $router->get('/users/{id}', ['uses' => 'UserController@getById']);
-    $router->post('/users/', ['uses' => 'UserController@create']);
+    $router->delete('/users/{id}', ['uses' => 'UserController@banUser']);
+    //$router->post('/users/', ['uses' => 'UserController@create']);
 
     $router->get('/posts/', ['uses' => 'PostController@allPosts']);
     $router->get('/posts/{id}', ['uses' => 'PostController@getPostById']);

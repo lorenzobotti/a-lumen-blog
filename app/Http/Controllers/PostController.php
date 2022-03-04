@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Scopes\OwnerScope;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Post;
@@ -11,20 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Show all users
-     *
-     */
     public function showAllUsers() {
         return User::all();
     }
@@ -35,17 +20,18 @@ class PostController extends Controller
             'content' => 'required|string',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         $title = $request->input('title');
         $content = $request->input('content');
 
+        /** @var Post $post */
         $post = new Post();
-        $post->fill([
-            'title' => $title,
-            'content' => $content,
-        ]);
-        $post['user_id'] = $user['id'];
+
+        $post->user_id = $user->id;
+        $post->title = $title;
+        $post->content = $content;
 
         $saved = $post->save();
         if (!$saved) {
@@ -57,14 +43,17 @@ class PostController extends Controller
     }
 
     public function deletePost(int $id) {
+        /** @var User $user */
         $user = Auth::user();
 
+        /** @var Post $post */
         $post = Post::find($id);
         if (!$post) {
             return new Response('', 404);
         }
 
-        if ($post->user_id != $user->id) {
+        $canDelete = $post->user_id == $user->id || $user->isMod();
+        if (!$canDelete) {
             return new Response('', 401);
         }
 
@@ -73,6 +62,7 @@ class PostController extends Controller
 
     public function getPostById(int $id)
     {
+        /** @var Post $post */
         $post = Post::with(['user', 'comments', 'comments.user'])->find($id);
         if (!$post) {
             return new Response('', 404);
@@ -82,7 +72,7 @@ class PostController extends Controller
     }
 
     public function allPosts() {
-        // eager loading
+        /** @var Post $post */
         return Post::with(['user', 'comments', 'comments.user'])->get();
     }
 }

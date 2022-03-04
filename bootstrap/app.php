@@ -77,6 +77,7 @@ $app->configure('app');
 
  $app->routeMiddleware([
      'auth' => App\Http\Middleware\Authenticate::class,
+     'banned' => App\Http\Middleware\BannedMiddleware::class,
      'premium' => App\Http\Middleware\PremiumMiddleware::class,
      'queries' => App\Http\Middleware\QueriesMiddleware::class,
  ]);

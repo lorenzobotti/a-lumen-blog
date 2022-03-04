@@ -5,14 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @property int id
+ * @property int user_id
+ * @property int post_id
  * @property string content
  */
 class Comment extends Model
 {
     protected $table = 'comments';
-    protected $fillable = [
-        'content',
-    ];
+    protected $fillable = ['content'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
@@ -22,9 +23,7 @@ class Comment extends Model
         return $this->belongsTo('App\Models\Post');
     }
 
-//    public static function boot() {
-//        parent::boot();
-//        static::addGlobalScope('OwnerScope');
-//    }
-
+    function canEditOrDelete(User $user) {
+        return $user->isMod() || ($user->isPremium() && $user->id == $this->user_id);
+    }
 }

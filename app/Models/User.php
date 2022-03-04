@@ -2,26 +2,24 @@
 
 namespace App\Models;
 
-use App\Helpers\TokenGenerator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property int id
+ * @property string subscription
+ * @property string first_name
+ * @property string last_name
+ * @property string api_token
+ * @property string password
+ * @property \DateTime banned_at
+ */
 class User extends Model {
     protected $table = 'users';
-    /**
-     * @var string[]
-     */
     protected $fillable = [
         'first_name', 'last_name', 'email',
         'profile_pic', 'password',
     ];
-
-    /**
-     * @var string[]
-     */
-    protected $hidden = [
-        'password', 'api_token',
-    ];
+    protected $hidden = ['password', 'api_token'];
 
     public function setPasswordAttribute(string $password) {
         $this->attributes['password'] = password_hash($password, PASSWORD_BCRYPT);
@@ -35,46 +33,13 @@ class User extends Model {
         return $this->hasMany('App\Models\Comment');
     }
 
-    public function isPremium(int $id): bool
+    public function isPremium(): bool
     {
         return $this->subscription === 'premium';
     }
 
+    public function isMod(): bool
+    {
+        return $this->subscription === 'mod';
+    }
 }
-
-
-
-
-
-
-//namespace App\Models;
-//
-//use Illuminate\Auth\Authenticatable;
-//use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-//use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-//use Illuminate\Database\Eloquent\Factories\HasFactory;
-//use Illuminate\Database\Eloquent\Model;
-//use Laravel\Lumen\Auth\Authorizable;
-//
-//class User extends Model implements AuthenticatableContract, AuthorizableContract
-//{
-//    use Authenticatable, Authorizable, HasFactory;
-//
-//    /**
-//     * The attributes that are mass assignable.
-//     *
-//     * @var string[]
-//     */
-//    protected $fillable = [
-//        'first_name', 'last_name', 'email', 'password',
-//    ];
-//
-//    /**
-//     * The attributes excluded from the model's JSON form.
-//     *
-//     * @var string[]
-//     */
-//    protected $hidden = [
-//        'password', 'api-token',
-//    ];
-//}

@@ -7,10 +7,10 @@ use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
-class PremiumMiddleware
+class BannedMiddleware
 {
     /**
-     * Rejects the request if the user is not premium or a moderator
+     * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
@@ -20,8 +20,9 @@ class PremiumMiddleware
     {
         /** @var User $user */
         $user = Auth::user();
-        if (!in_array($user->subscription, ['premium', 'mod'], true)) {
-            return new Response('', 403);
+
+        if ($user->banned_at) {
+            return new Response('', 401);
         }
 
         return $next($request);
