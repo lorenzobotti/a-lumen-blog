@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Auth;
  */
 class UserController extends Controller
 {
-    public function showAllUsers() {
+    public function showAllUsers()
+    {
         return User::all();
     }
 
-    public function getById($id) {
+    public function getById($id)
+    {
         $user = User::find($id);
         if (!$user) {
             return new Response('', 404);
@@ -26,7 +28,8 @@ class UserController extends Controller
         return $user;
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $this->validate($request, [
             'email' => 'required|email',
             'password' => 'required',
@@ -49,7 +52,8 @@ class UserController extends Controller
         return $user->api_token;
     }
 
-    public function newToken(Request $request) {
+    public function newToken(Request $request)
+    {
         /** @var User $user */
         $user = Auth::user();
 
@@ -64,7 +68,8 @@ class UserController extends Controller
         return $newToken;
     }
 
-    public function banUser($id) {
+    public function banUser($id)
+    {
         /** @var User $user */
         $banner = Auth::user();
 
@@ -78,10 +83,15 @@ class UserController extends Controller
             return new Response('', 404);
         }
 
-        $banned->delete();
+        $banned->banned_at = new \DateTime();
+        $saved = $banned->save();
+        if (!$saved) {
+            return new Response('', 500);
+        }
     }
 
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
         $this->validate($request, [
             'email' => 'required|email',
             'password' => 'required',

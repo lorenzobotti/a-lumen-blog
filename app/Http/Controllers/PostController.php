@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    public function showAllUsers() {
+    public function showAllUsers()
+    {
         return User::all();
     }
 
-    public function createPost(Request $request) {
+    public function createPost(Request $request)
+    {
         $this->validate($request, [
             'title' => 'required|string',
             'content' => 'required|string',
@@ -38,11 +40,11 @@ class PostController extends Controller
             return new Response('', 500);
         }
 
-
         return $post;
     }
 
-    public function deletePost(int $id) {
+    public function deletePost(int $id)
+    {
         /** @var User $user */
         $user = Auth::user();
 
@@ -57,7 +59,10 @@ class PostController extends Controller
             return new Response('', 401);
         }
 
-        $post->delete();
+        $deleted = $post->delete();
+        if (!$deleted) {
+            return new Response('', 500);
+        }
     }
 
     public function getPostById(int $id)
@@ -71,7 +76,8 @@ class PostController extends Controller
         return $post;
     }
 
-    public function allPosts() {
+    public function allPosts()
+    {
         /** @var Post $post */
         return Post::with(['user', 'comments', 'comments.user'])->get();
     }

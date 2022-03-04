@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function createComment(Request $request) {
+    public function createComment(Request $request)
+    {
         $this->validate($request, [
             'content' => 'required|string',
         ]);
@@ -34,7 +35,8 @@ class CommentController extends Controller
         return $comment;
     }
 
-    public function getCommentById(int $id) {
+    public function getCommentById(int $id)
+    {
         /** @var Comment|null $comment */
         $comment = Comment::find($id);
         if (!$comment) {
@@ -44,7 +46,8 @@ class CommentController extends Controller
         return $comment;
     }
 
-    public function editComment(int $id, Request $request) {
+    public function editComment(int $id, Request $request)
+    {
         $this->validate($request, [
             'content' => 'required|string',
         ]);
@@ -68,8 +71,8 @@ class CommentController extends Controller
     }
 
 
-
-    public function deleteComment(int $id) {
+    public function deleteComment(int $id)
+    {
         /** @var User $user */
         $user = Auth::user();
 
@@ -83,6 +86,9 @@ class CommentController extends Controller
             return new Response('', 401);
         }
 
-        $comment->delete();
+        $deleted = $comment->delete();
+        if (!$deleted) {
+            return new Response('', 500);
+        }
     }
 }

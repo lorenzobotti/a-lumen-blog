@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Auth;
 class BannedMiddleware
 {
     /**
-     * Handle an incoming request.
+     * Autorizza la richiesta solo se l'utente è loggato e non bannato.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -22,7 +22,7 @@ class BannedMiddleware
         $user = Auth::user();
 
         if ($user->banned_at) {
-            return new Response('', 401);
+            return new Response('', 403);
         }
 
         return $next($request);

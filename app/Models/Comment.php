@@ -15,15 +15,18 @@ class Comment extends Model
     protected $table = 'comments';
     protected $fillable = ['content'];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo('App\Models\User');
     }
 
-    public function post() {
+    public function post()
+    {
         return $this->belongsTo('App\Models\Post');
     }
 
-    function canEditOrDelete(User $user) {
+    function canEditOrDelete(User $user)
+    {
         return $user->isMod() || ($user->isPremium() && $user->id == $this->user_id);
     }
 }

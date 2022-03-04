@@ -25,38 +25,38 @@ $router->get('/', function () use ($router) {
 // scommenta per ricevere info sulle query eseguite nelle risposte
 // $router->group(['middleware' => 'queries'], function () use ($router) {
 
-    // area protetta
-    $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
-        $router->post('/posts', ['uses' => 'PostController@createPost']);
-        $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
+// area protetta
+$router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
+    $router->post('/posts', ['uses' => 'PostController@createPost']);
+    $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
 
-        $router->post('/comments', ['uses' => 'CommentController@createComment']);
+    $router->post('/comments', ['uses' => 'CommentController@createComment']);
 
-        // area premium
-        $router->group(['middleware' => 'premium'], function () use ($router) {
-            $router->put('/comments/{id}', ['uses' => 'CommentController@editComment']);
-            $router->delete('/comments/{id}', ['uses' => 'CommentController@deleteComment']);
-        });
+    // area premium
+    $router->group(['middleware' => 'premium'], function () use ($router) {
+        $router->put('/comments/{id}', ['uses' => 'CommentController@editComment']);
+        $router->delete('/comments/{id}', ['uses' => 'CommentController@deleteComment']);
     });
+});
 
-    $router->get('/users/', ['uses' => 'UserController@showAllUsers']);
-    $router->get('/users/{id}', ['uses' => 'UserController@getById']);
-    $router->delete('/users/{id}', ['uses' => 'UserController@banUser']);
-    //$router->post('/users/', ['uses' => 'UserController@create']);
+$router->get('/users/', ['uses' => 'UserController@showAllUsers']);
+$router->get('/users/{id}', ['uses' => 'UserController@getById']);
+$router->delete('/users/{id}', ['uses' => 'UserController@banUser']);
+//$router->post('/users/', ['uses' => 'UserController@create']);
 
-    $router->get('/posts/', ['uses' => 'PostController@allPosts']);
-    $router->get('/posts/{id}', ['uses' => 'PostController@getPostById']);
-    $router->get('/posts/{id}/user', ['uses' => 'PostController@getUserByPostId']);
+$router->get('/posts/', ['uses' => 'PostController@allPosts']);
+$router->get('/posts/{id}', ['uses' => 'PostController@getPostById']);
+$router->get('/posts/{id}/user', ['uses' => 'PostController@getUserByPostId']);
 
-    $router->get('/comments/{id}', ['uses' => 'CommentController@getCommentById']);
+$router->get('/comments/{id}', ['uses' => 'CommentController@getCommentById']);
 
-    $router->group(['prefix' => 'auth'], function () use ($router) {
-        $router->post('/login', ['uses' => 'UserController@login']);
-        $router->post('/register', ['uses' => 'UserController@create']);
+$router->group(['prefix' => 'auth'], function () use ($router) {
+    $router->post('/login', ['uses' => 'UserController@login']);
+    $router->post('/register', ['uses' => 'UserController@create']);
 
-        $router->group(['middleware' => 'auth'], function() use ($router) {
-            $router->post('refresh', ['uses' => 'UserController@newToken']);
-        });
+    $router->group(['middleware' => 'auth'], function () use ($router) {
+        $router->post('refresh', ['uses' => 'UserController@newToken']);
     });
+});
 // });
 
