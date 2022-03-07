@@ -22,7 +22,7 @@ class BannedMiddleware
         $user = Auth::user();
 
         if ($user->banned_at) {
-            return new Response('banned lmao', 403);
+            return new Response('', 403);
         }
 
         return $next($request);

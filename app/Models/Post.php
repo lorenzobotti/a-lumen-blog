@@ -36,6 +36,10 @@ class Post extends Model
         return $this->hasMany(PostLike::class, 'post_id', 'id');
     }
 
+    public function categories() {
+        return $this->belongsToMany(Category::class,'posts_categories', 'post_id', 'category_id');
+    }
+
     public function likeCount(): Attribute {
 //        return Attribute::make(
 //            get: fn($val) => count($val),

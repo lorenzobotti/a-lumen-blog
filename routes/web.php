@@ -23,10 +23,12 @@ $router->get('/', function () use ($router) {
 
 
 // scommenta per ricevere info sulle query eseguite nelle risposte
-$router->group(['middleware' => 'queries'], function () use ($router) {
+// $router->group(['middleware' => 'queries'], function () use ($router) {
 
 // area protetta
 $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
+    $router->get('/posts/homepage', ['uses' => 'UserController@postsFromFavorites']);
+
     $router->post('/posts', ['uses' => 'PostController@createPost']);
     $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
     $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
@@ -66,5 +68,5 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
         $router->post('refresh', ['uses' => 'UserController@newToken']);
     });
 });
-});
+// });
 

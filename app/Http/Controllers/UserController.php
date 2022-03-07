@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
@@ -17,7 +18,7 @@ class UserController extends Controller
 
     public function getById($id)
     {
-        $user = User::find($id);
+        $user = User::with('categories')->find($id);
         if (!$user) {
             return new Response('', 404);
         }
@@ -105,5 +106,15 @@ class UserController extends Controller
             return new Response('', 500);
         }
         return $user;
+    }
+
+    public function postsFromFavorites() {
+        /** @var User $user */
+        $user = Auth::user();
+
+        // TODO: non ho idea di come risolvere questo problema senza usare il query builder
+        return Post::with(['categories'])
+            ->whereIn('categories', $user->categories())
+            ->get();
     }
 }

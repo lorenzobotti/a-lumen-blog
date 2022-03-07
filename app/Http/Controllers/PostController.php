@@ -23,6 +23,7 @@ class PostController extends Controller
         $this->validate($request, [
             'title' => 'required|string',
             'content' => 'required|string',
+            'categories' => 'array',
         ]);
 
         /** @var User $user */
@@ -71,7 +72,7 @@ class PostController extends Controller
     public function getPostById(int $id)
     {
         /** @var Post|null $post */
-        $post = Post::with(['user', 'comments', 'comments.user'])->find($id);
+        $post = Post::with(['user', 'comments', 'comments.user', 'categories'])->find($id);
         if (!$post) {
             return new Response('', 404);
         }
