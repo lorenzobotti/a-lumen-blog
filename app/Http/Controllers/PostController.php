@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\IsDuplicate;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Post;
+use App\Models\PostLike;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,18 +70,88 @@ class PostController extends Controller
 
     public function getPostById(int $id)
     {
-        /** @var Post $post */
+        /** @var Post|null $post */
         $post = Post::with(['user', 'comments', 'comments.user'])->find($id);
         if (!$post) {
             return new Response('', 404);
         }
+
+        // $post->attributes['likes'] = $post->like_count;
 
         return $post;
     }
 
     public function allPosts()
     {
-        /** @var Post $post */
+        /** @var Post[] $post */
         return Post::with(['user', 'comments', 'comments.user'])->get();
+    }
+
+    public function getLikesByPostId(int $id)
+    {
+        /** @var Post|null $post */
+        $post = Post::find($id);
+        if (!$post) {
+            return new Response('', 404);
+        }
+
+        $likes = $post->likes()->get();
+        return $likes;
+    }
+
+    public function likePost(int $id)
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return new Response('', 401);
+        }
+
+        /** @var Post|null $post */
+        $post = Post::find($id);
+        if (!$post) {
+            return new Response('', 404);
+        }
+
+        $like = new PostLike();
+        $like->user_id = $user->id;
+        $like->post_id = $post->id;
+
+        /* TODO: secondo me esiste un modo meno verboso / più riutilizzabile
+         * per controllare se ci sono duplicati o meno */
+        try {
+            $saved = $like->save();
+            if (!$saved) {
+                return new Response('', 500);
+            }
+        } catch (QueryException $e) {
+            if (IsDuplicate::isDuplicate($e)) {
+                return new Response('', 409);
+            } else {
+                return new Response('', 500);
+            }
+        }
+    }
+
+    public function unlikePost(int $id)
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return new Response('', 401);
+        }
+
+        /** @var PostLike|null $like */
+        $like = PostLike::where('user_id', $user->id)->where('post_id', $id)->first();
+        if (!$like) {
+            return new Response('', 404);
+        }
+
+        // TODO: se non metto forceDelete poi quando vado a rimettere il like
+        // pensa che esista già.
+        $deleted = $like->forceDelete();
+        if (!$deleted) {
+            return new Response('', 500);
+        }
     }
 }

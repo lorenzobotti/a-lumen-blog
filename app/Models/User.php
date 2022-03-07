@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\PostLike;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,31 +31,18 @@ class User extends Model
         $this->attributes['password'] = password_hash($password, PASSWORD_BCRYPT);
     }
 
-//    /**
-//     * getter per first_name per evidenziare gli utenti bannati come su reddit
-//     *
-//     * @return Attribute
-//     */
-//    public function firstName(): Attribute {
-//        return Attribute::make(
-//            get: function ($value, $attributes) {
-//                if ($attributes['banned_at']) {
-//                    return '[banned]';
-//                } else {
-//                    return $this->first_name;
-//                }
-//            }
-//        );
-//    }
-
     public function posts()
     {
-        return $this->hasMany('App\Models\Post');
+        return $this->hasMany(Post::class);
     }
 
     public function comments()
     {
-        return $this->hasMany('App\Models\Comment');
+        return $this->hasMany(Comment::class);
+    }
+
+    public function likes() {
+        return $this->hasMany(PostLike::class);
     }
 
     public function isPremium(): bool

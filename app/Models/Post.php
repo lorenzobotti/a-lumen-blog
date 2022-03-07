@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\PostLike;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -17,19 +19,31 @@ class Post extends Model
 
     protected $table = 'posts';
     protected $fillable = ['title', 'content'];
+    protected $hidden = ['likes'];
+    protected $appends = ['like_count'];
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     public function comments()
     {
-        return $this->hasMany('App\Models\Comment');
+        return $this->hasMany(Comment::class);
     }
 
-//    public static function boot() {
-//        parent::boot();
-//        static::addGlobalScope(new OwnerScope);
-//    }
+    public function likes() {
+        return $this->hasMany(PostLike::class, 'post_id', 'id');
+    }
+
+    public function likeCount(): Attribute {
+//        return Attribute::make(
+//            get: fn($val) => count($val),
+//        );
+          return Attribute::make(
+            get: fn($val) => $this->likes()->count(),
+        );
+
+        // return $this->likes()->count();
+    }
 }

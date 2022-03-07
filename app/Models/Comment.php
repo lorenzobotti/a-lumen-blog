@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Post;
+use App\Models\User;
+use App\Models\CommentLike;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,12 +20,16 @@ class Comment extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     public function post()
     {
-        return $this->belongsTo('App\Models\Post');
+        return $this->belongsTo(Post::class);
+    }
+
+    public function likes() {
+        return $this->hasMany(CommentLike::class);
     }
 
     function canEditOrDelete(User $user)

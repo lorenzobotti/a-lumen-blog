@@ -8,9 +8,6 @@ use App\Models\User;
 use App\Helpers\TokenGenerator;
 use Illuminate\Support\Facades\Auth;
 
-/**
- *
- */
 class UserController extends Controller
 {
     public function showAllUsers()
@@ -73,7 +70,7 @@ class UserController extends Controller
         /** @var User $user */
         $banner = Auth::user();
 
-        if (!$banner->isMod()) {
+        if (!$banner || !$banner->isMod()) {
             return new Response('', 401);
         }
 

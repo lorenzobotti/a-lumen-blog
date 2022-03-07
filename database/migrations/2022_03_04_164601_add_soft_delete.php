@@ -10,7 +10,7 @@ return new class extends Migration
     {
 
         Schema::table('users', function(Blueprint $schema) {
-            $schema->timestamp('banned_at');
+            $schema->timestamp('banned_at')->nullable(true);
             $schema->softDeletes();
         });
 

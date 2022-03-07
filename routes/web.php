@@ -23,12 +23,19 @@ $router->get('/', function () use ($router) {
 
 
 // scommenta per ricevere info sulle query eseguite nelle risposte
-// $router->group(['middleware' => 'queries'], function () use ($router) {
+$router->group(['middleware' => 'queries'], function () use ($router) {
 
 // area protetta
 $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
     $router->post('/posts', ['uses' => 'PostController@createPost']);
     $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
+    $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
+
+    $router->post('/posts/{id}/likes', ['uses' => 'PostController@likePost']);
+    $router->delete('/posts/{id}/likes', ['uses' => 'PostController@unlikePost']);
+
+    $router->post('/comments/{id}/likes', ['uses' => 'CommentController@likeComment']);
+    $router->delete('/comments/{id}/likes', ['uses' => 'CommentController@unlikeComment']);
 
     $router->post('/comments', ['uses' => 'CommentController@createComment']);
 
@@ -47,6 +54,7 @@ $router->delete('/users/{id}', ['uses' => 'UserController@banUser']);
 $router->get('/posts/', ['uses' => 'PostController@allPosts']);
 $router->get('/posts/{id}', ['uses' => 'PostController@getPostById']);
 $router->get('/posts/{id}/user', ['uses' => 'PostController@getUserByPostId']);
+$router->get('/posts/{id}/likes', ['uses' => 'PostController@getLikesByPostId']);
 
 $router->get('/comments/{id}', ['uses' => 'CommentController@getCommentById']);
 
@@ -58,5 +66,5 @@ $router->group(['prefix' => 'auth'], function () use ($router) {
         $router->post('refresh', ['uses' => 'UserController@newToken']);
     });
 });
-// });
+});
 
