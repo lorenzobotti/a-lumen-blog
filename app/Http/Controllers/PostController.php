@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\IsDuplicate;
+use App\Models\Category;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -29,8 +30,11 @@ class PostController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+
         $title = $request->input('title');
         $content = $request->input('content');
+        /** @var string[] $categories */
+        $categories = $request->input('categories');
 
         /** @var Post $post */
         $post = new Post();
@@ -42,6 +46,12 @@ class PostController extends Controller
         $saved = $post->save();
         if (!$saved) {
             return new Response('', 500);
+        }
+
+        if ($categories) {
+            foreach ($categories as $categoryName) {
+                $categoryModel = Category::createIfNotExist($categoryName);
+            }
         }
 
         return $post;

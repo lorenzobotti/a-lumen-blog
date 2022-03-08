@@ -80,6 +80,7 @@ $app->configure('app');
      'banned' => App\Http\Middleware\BannedMiddleware::class,
      'premium' => App\Http\Middleware\PremiumMiddleware::class,
      'queries' => App\Http\Middleware\QueriesMiddleware::class,
+     'format' => App\Http\Middleware\FormatMiddleware::class,
  ]);
 
 /*

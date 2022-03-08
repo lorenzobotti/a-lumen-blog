@@ -33,7 +33,7 @@ class Category extends Model
      * @param string $name
      * @return self
      */
-    public static function createIfNotExist(string $name): self {
+    public static function createIfNotExist(string $name): Category {
         /** @var Category|null $alreadyExisting */
         $alreadyExisting = self::where('name', $name)->first();
         if ($alreadyExisting) {
