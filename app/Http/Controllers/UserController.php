@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
 use App\Helpers\TokenGenerator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -112,9 +114,21 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+        // return $user->favorites()->get();
+
         // TODO: non ho idea di come risolvere questo problema senza usare il query builder
-        return Post::with(['categories'])
-            ->whereIn('categories', $user->categories())
+        // TODO: attendere approvazione di Stefano
+        // return Category::with(['posts', 'users'])->has('user')->where('user.id', $user->id)->get();
+        // return Category::with(['posts', 'users'])->has('users.id', '=', $user->id)->get();
+//        return Category::with(['posts', 'users', 'posts.categories'])->whereHas('users', function ($query) use ($user) {
+//            $query->where('users.id', $user->id);
+//        })->get();
+
+        // TODO: fare coi modelli
+        return DB::table('posts')
+            ->join('posts_categories', 'posts_categories.post_id', '=', 'posts.id')
+            ->join('favorite_categories', 'posts_categories.category_id', '=', 'favorite_categories.category_id')
+            ->where('favorite_categories.user_id', $user->id)
             ->get();
     }
 }

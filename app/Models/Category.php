@@ -21,6 +21,11 @@ class Category extends Model
         return $this->belongsToMany(Post::class, 'posts_categories', 'category_id', 'post_id');
     }
 
+    public function users() {
+        return $this->belongsToMany(User::class, 'favorite_categories', 'category_id', 'user_id');
+    }
+
+
     /**
      * Cerca di creare la categoria passata, se esiste già
      * usa quella esistente. Restituisce l'id

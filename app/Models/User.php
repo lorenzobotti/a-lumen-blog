@@ -45,6 +45,11 @@ class User extends Model
         return $this->hasMany(PostLike::class);
     }
 
+    public function favorites() {
+        // ?????
+        return $this->hasManyThrough(Post::class, Category::class, );
+    }
+
     public function categories() {
         return $this->belongsToMany(Category::class, 'favorite_categories', 'user_id', 'category_id');
     }
