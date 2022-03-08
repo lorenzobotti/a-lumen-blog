@@ -18,8 +18,7 @@ class QueriesMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // TODO: far riconoscere all'app da sola se è in local o prod (sarà una variabile d'ambiente?)
-        $staging = true;
+        $staging = getenv('APP_ENV') === 'local';
 
         DB::enableQueryLog();
         $res = $next($request);

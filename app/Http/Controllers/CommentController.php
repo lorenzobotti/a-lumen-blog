@@ -64,7 +64,7 @@ class CommentController extends Controller
             return new Response('', 404);
         }
 
-        if (!$comment->canEditOrDelete($user)) {
+        if (!$user->canEditOrDelete($comment)) {
             return new Response('', 401);
         }
 
@@ -85,7 +85,7 @@ class CommentController extends Controller
             return new Response('', 404);
         }
 
-        if (!$comment->canEditOrDelete($user)) {
+        if (!$user->canEditOrDelete($comment)) {
             return new Response('', 401);
         }
 

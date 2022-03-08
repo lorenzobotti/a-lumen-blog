@@ -68,4 +68,9 @@ class User extends Model
     {
         return $this->banned_at != null;
     }
+
+    function canEditOrDelete(Comment $comment)
+    {
+        return $this->isMod() || ($this->isPremium() && $this->id == $comment->user_id);
+    }
 }

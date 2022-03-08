@@ -31,9 +31,4 @@ class Comment extends Model
     public function likes() {
         return $this->hasMany(CommentLike::class);
     }
-
-    function canEditOrDelete(User $user)
-    {
-        return $user->isMod() || ($user->isPremium() && $user->id == $this->user_id);
-    }
 }
