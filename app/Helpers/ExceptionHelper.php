@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Database\QueryException;
 
-class IsDuplicate
+class ExceptionHelper
 {
     /**
      * Determina se l'eccezione riportata da Model::save() è

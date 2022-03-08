@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\IsDuplicate;
+use App\Helpers\ExceptionHelper;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -136,7 +136,7 @@ class PostController extends Controller
                 return new Response('', 500);
             }
         } catch (QueryException $e) {
-            if (IsDuplicate::isDuplicate($e)) {
+            if (ExceptionHelper::isDuplicate($e)) {
                 return new Response('', 409);
             } else {
                 return new Response('', 500);

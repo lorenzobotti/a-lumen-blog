@@ -3,7 +3,7 @@
 namespace App\Models;
 
 
-use App\Helpers\IsDuplicate;
+use App\Helpers\ExceptionHelper;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;

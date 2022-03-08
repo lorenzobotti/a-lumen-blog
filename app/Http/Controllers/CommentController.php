@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\IsDuplicate;
+use App\Helpers\ExceptionHelper;
 use App\Models\CommentLike;
 use App\Scopes\OwnerScope;
 use Illuminate\Database\QueryException;
@@ -115,7 +115,7 @@ class CommentController extends Controller
                 return new Response('', 500);
             }
         } catch(QueryException $e) {
-            if (IsDuplicate::isDuplicate($e)) {
+            if (ExceptionHelper::isDuplicate($e)) {
                 return new Response('', 409);
             } else {
                 return new Response('', 500);
