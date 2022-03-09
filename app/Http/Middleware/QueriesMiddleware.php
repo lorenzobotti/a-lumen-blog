@@ -19,6 +19,7 @@ class QueriesMiddleware
     public function handle(Request $request, Closure $next)
     {
         $staging = getenv('APP_ENV') === 'local';
+        // $staging = false;
 
         DB::enableQueryLog();
         $res = $next($request);
@@ -30,9 +31,17 @@ class QueriesMiddleware
             $status = $res->status();
         }
 
+        // è convoluto ma il succo è che prova a interpretare la risposta
+        // come json e se non riesce manda l'originale come stringa
+        $decodedContent = json_decode($res->content());
+        $content = $decodedContent;
+        if (!$content) {
+            $content = $res->content();
+        }
+
         if ($staging) {
             return new Response([
-                'response' => $res,
+                'response' => $content,
                 'queries' => $queries,
             ], $status);
         } else {

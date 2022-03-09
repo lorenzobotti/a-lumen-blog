@@ -23,7 +23,8 @@ $router->get('/', function () use ($router) {
 
 
 // scommenta per ricevere info sulle query eseguite nelle risposte
-$router->group(['middleware' => ['queries', 'format']], function () use ($router) {
+// $router->group(['middleware' => ['queries', 'format']], function () use ($router) {
+$router->group(['middleware' => []], function () use ($router) {
 
 // area protetta
 $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {

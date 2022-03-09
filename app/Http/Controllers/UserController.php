@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Post;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
@@ -116,19 +117,26 @@ class UserController extends Controller
 
         // return $user->favorites()->get();
 
-        // TODO: non ho idea di come risolvere questo problema senza usare il query builder
-        // TODO: attendere approvazione di Stefano
+
+        // $posts = Post::with(['categories', 'categories.users'])->whereBelongsTo($user->categories());
+        // return $posts;
+
+        $favorites = $user->categories()->pluck('category_id');
+        return Post::whereHas('categories', function($query) use ($favorites) {
+            $query->whereIn('category_id', $favorites);
+        })->get();
+
+
         // return Category::with(['posts', 'users'])->has('user')->where('user.id', $user->id)->get();
         // return Category::with(['posts', 'users'])->has('users.id', '=', $user->id)->get();
 //        return Category::with(['posts', 'users', 'posts.categories'])->whereHas('users', function ($query) use ($user) {
 //            $query->where('users.id', $user->id);
 //        })->get();
 
-        // TODO: fare coi modelli
-        return DB::table('posts')
-            ->join('posts_categories', 'posts_categories.post_id', '=', 'posts.id')
-            ->join('favorite_categories', 'posts_categories.category_id', '=', 'favorite_categories.category_id')
-            ->where('favorite_categories.user_id', $user->id)
-            ->get();
+//        return DB::table('posts')
+//            ->join('posts_categories', 'posts_categories.post_id', '=', 'posts.id')
+//            ->join('favorite_categories', 'posts_categories.category_id', '=', 'favorite_categories.category_id')
+//            ->where('favorite_categories.user_id', $user->id)
+//            ->get();
     }
 }

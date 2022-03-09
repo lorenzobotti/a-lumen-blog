@@ -87,6 +87,12 @@ class PostController extends Controller
             return new Response('', 404);
         }
 
+
+        $user = Auth::user();
+        if ($user) {
+            $userLikedPost = PostLike::where('user_id', $user->id)->where('post_id', $id)->get() != null;
+            $post->fillJsonAttribute('liked_by_you->', $userLikedPost);
+        }
         // $post->attributes['likes'] = $post->like_count;
 
         return $post;
