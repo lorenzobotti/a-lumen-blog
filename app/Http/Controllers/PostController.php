@@ -51,6 +51,7 @@ class PostController extends Controller
         if ($categories) {
             foreach ($categories as $categoryName) {
                 $categoryModel = Category::createIfNotExist($categoryName);
+                $post->categories()->save($categoryModel);
             }
         }
 
@@ -101,7 +102,7 @@ class PostController extends Controller
     public function allPosts()
     {
         /** @var Post[] $post */
-        return Post::with(['user', 'comments', 'comments.user'])->get();
+        return Post::with(['user', 'comments', 'comments.user', 'categories'])->get();
     }
 
     public function getLikesByPostId(int $id)
