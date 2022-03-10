@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Helpers\ExceptionHelper;
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
 use App\Helpers\TokenGenerator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {

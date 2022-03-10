@@ -14,7 +14,7 @@ class ExceptionHelper
      * @param QueryException $e
      * @return bool
      */
-    public static function isDuplicate(QueryException $e) {
+    public static function isDuplicate(QueryException $e): bool {
         return $e->errorInfo[1] === 1062;
     }
 }

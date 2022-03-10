@@ -14,11 +14,7 @@
 */
 
 $router->get('/', function () use ($router) {
-    return [
-        "doesItWork" => "yes",
-    ];
-
-    //return $router->app->version();
+    return $router->app->version();
 });
 
 

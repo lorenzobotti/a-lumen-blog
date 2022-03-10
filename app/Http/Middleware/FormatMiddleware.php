@@ -2,6 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\NotFoundException;
+use App\Exceptions\NotLoggedException;
+use App\Exceptions\NotPremiumException;
 use Closure;
 use Illuminate\Http\Response;
 
@@ -18,7 +21,23 @@ class FormatMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $res = $next($request);
+        try {
+            $res = $next($request);
+        } catch (Exception $e) {
+            switch ($e::class) {
+                case NotFoundException::class:
+                    return new Response('', 404);
+                case NotLoggedException::class:
+                    return new Response('', 401);
+                case NotPremiumException::class:
+                    return new Response('', 409);
+                default:
+                    return new Response([
+                        'error' => $e->getMessage(),
+                    ], 500);
+            }
+        }
+
         if ($res instanceof Response) {
             if ($res->status() < 200 || $res->status() >= 300) {
                 $res->setContent(json_encode([
