@@ -23,12 +23,13 @@ $router->get('/', function () use ($router) {
 
 
 // scommenta per ricevere info sulle query eseguite nelle risposte
-// $router->group(['middleware' => ['queries', 'format']], function () use ($router) {
-$router->group(['middleware' => []], function () use ($router) {
+$router->group(['middleware' => ['queries', 'format']], function () use ($router) {
+// $router->group(['middleware' => []], function () use ($router) {
 
 // area protetta
 $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
     $router->get('/posts/homepage', ['uses' => 'UserController@postsFromFavorites']);
+
     $router->post('/favorites', ['uses' => 'UserController@addFavorite']);
     $router->delete('/favorites', ['uses' => 'UserController@removeFavorite']);
     $router->get('/favorites', ['uses' => 'UserController@getFavorites']);
@@ -54,7 +55,6 @@ $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
 $router->get('/users/', ['uses' => 'UserController@showAllUsers']);
 $router->get('/users/{id}', ['uses' => 'UserController@getById']);
 $router->delete('/users/{id}', ['uses' => 'UserController@banUser']);
-//$router->post('/users/', ['uses' => 'UserController@create']);
 
 $router->get('/posts/', ['uses' => 'PostController@allPosts']);
 $router->get('/posts/{id}', ['uses' => 'PostController@getPostById']);

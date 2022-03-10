@@ -25,6 +25,7 @@ class PostController extends Controller
             'title' => 'required|string',
             'content' => 'required|string',
             'categories' => 'array',
+            'categories.*' => 'string',
         ]);
 
         /** @var User $user */

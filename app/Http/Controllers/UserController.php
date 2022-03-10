@@ -23,7 +23,8 @@ class UserController extends Controller
 
     public function getById($id)
     {
-        $user = User::with('categories')->find($id);
+        /** @var User|null $user */
+        $user = User::with(['categories', 'posts'])->find($id);
         if (!$user) {
             return new Response('', 404);
         }
@@ -73,7 +74,7 @@ class UserController extends Controller
 
     public function banUser($id)
     {
-        /** @var User $user */
+        /** @var User|null $user */
         $banner = Auth::user();
 
         if (!$banner || !$banner->isMod()) {
@@ -117,23 +118,11 @@ class UserController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // return $user->favorites()->get();
-
-
-        // $posts = Post::with(['categories', 'categories.users'])->whereBelongsTo($user->categories());
-        // return $posts;
-
         $favorites = $user->categories()->pluck('category_id');
-        return Post::whereHas('categories', function($query) use ($favorites) {
-            $query->whereIn('category_id', $favorites);
-        })->get();
-
-
-        // return Category::with(['posts', 'users'])->has('user')->where('user.id', $user->id)->get();
-        // return Category::with(['posts', 'users'])->has('users.id', '=', $user->id)->get();
-//        return Category::with(['posts', 'users', 'posts.categories'])->whereHas('users', function ($query) use ($user) {
-//            $query->where('users.id', $user->id);
-//        })->get();
+        return Post::with(['user', 'comments', 'comments.user', 'categories'])
+            ->whereHas('categories', function($query) use ($favorites) {
+                $query->whereIn('category_id', $favorites);
+            })->get();
 
 //        return DB::table('posts')
 //            ->join('posts_categories', 'posts_categories.post_id', '=', 'posts.id')
@@ -144,46 +133,53 @@ class UserController extends Controller
 
     public function addFavorite(Request $request) {
         $this->validate($request, [
-            'name' => 'required|string',
+            'categories' => 'required|array',
+            'categories.*' => 'string',
         ]);
 
         /** @var User $user */
         $user = Auth::user();
 
-        /** @var string $name */
-        $name = $request->input('name');
-        $category = Category::createIfNotExist($name);
+        /** @var string[] $names */
+        $names = $request->input('categories');
 
-        try {
-           $user->categories()->save($category);
-        } catch (QueryException $e) {
-            if (!ExceptionHelper::isDuplicate($e)) {
-                return new Response('', 500);
+        foreach ($names as $name) {
+            try {
+                $category = Category::createIfNotExist($name);
+                echo $category->id;
+                $user->categories()->save($category);
+            } catch (QueryException $e) {
+                if (!ExceptionHelper::isDuplicate($e)) {
+                    return new Response('', 500);
+                }
             }
         }
     }
 
     public function removeFavorite(Request $request) {
         $this->validate($request, [
-            'name' => 'required|string',
+            'categories' => 'required|array',
+            'categories.*' => 'string',
         ]);
 
         /** @var User $user */
         $user = Auth::user();
 
-        /** @var string $name */
-        $name = $request->input('name');
-        /** @var Category|null $category */
-        $category = Category::where('name', $name);
+        /** @var string[] $names */
+        $names = $request->input('categories');
+        foreach($names as $name) {
+            /** @var Category|null $category */
+            $category = Category::where('name', $name);
 
-        if (!$category) {
-            return new Response('', 404);
+            if (!$category) {
+                continue;
+            }
+
+            $user->categories()->delete($category);
         }
-
-        $user->categories()->delete($category);
     }
 
-    public function getFavorite(Request $request) {
+    public function getFavorites(Request $request) {
         /** @var User $user */
         $user = Auth::user();
 
