@@ -101,10 +101,9 @@ class UserController extends Controller
             'password' => 'required',
         ]);
 
-        $fields = $request->all();
-
         $user = new User();
-        $user->fill($fields);
+        $user->email = $request->input('email');
+        $user->password = $request->input('password');
         $user->api_token = TokenGenerator::generateRandomString(64);
 
         $saved = $user->save();

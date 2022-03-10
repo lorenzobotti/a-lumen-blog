@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int id
  * @property string subscription
  * @property string first_name
+ * @property string email
  * @property string last_name
  * @property string api_token
  * @property string password
