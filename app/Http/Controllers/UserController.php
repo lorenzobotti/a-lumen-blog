@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ExceptionHelper;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\User;
@@ -138,5 +140,53 @@ class UserController extends Controller
 //            ->join('favorite_categories', 'posts_categories.category_id', '=', 'favorite_categories.category_id')
 //            ->where('favorite_categories.user_id', $user->id)
 //            ->get();
+    }
+
+    public function addFavorite(Request $request) {
+        $this->validate($request, [
+            'name' => 'required|string',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        /** @var string $name */
+        $name = $request->input('name');
+        $category = Category::createIfNotExist($name);
+
+        try {
+           $user->categories()->save($category);
+        } catch (QueryException $e) {
+            if (!ExceptionHelper::isDuplicate($e)) {
+                return new Response('', 500);
+            }
+        }
+    }
+
+    public function removeFavorite(Request $request) {
+        $this->validate($request, [
+            'name' => 'required|string',
+        ]);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        /** @var string $name */
+        $name = $request->input('name');
+        /** @var Category|null $category */
+        $category = Category::where('name', $name);
+
+        if (!$category) {
+            return new Response('', 404);
+        }
+
+        $user->categories()->delete($category);
+    }
+
+    public function getFavorite(Request $request) {
+        /** @var User $user */
+        $user = Auth::user();
+
+        return $user->categories()->get();
     }
 }

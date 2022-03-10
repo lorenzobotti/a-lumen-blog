@@ -29,9 +29,11 @@ $router->group(['middleware' => []], function () use ($router) {
 // area protetta
 $router->group(['middleware' => ['auth', 'banned']], function () use ($router) {
     $router->get('/posts/homepage', ['uses' => 'UserController@postsFromFavorites']);
+    $router->post('/favorites', ['uses' => 'UserController@addFavorite']);
+    $router->delete('/favorites', ['uses' => 'UserController@removeFavorite']);
+    $router->get('/favorites', ['uses' => 'UserController@getFavorites']);
 
     $router->post('/posts', ['uses' => 'PostController@createPost']);
-    $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
     $router->delete('/posts/{id}', ['uses' => 'PostController@deletePost']);
 
     $router->post('/posts/{id}/likes', ['uses' => 'PostController@likePost']);
