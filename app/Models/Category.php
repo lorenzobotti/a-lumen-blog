@@ -6,7 +6,6 @@ namespace App\Models;
 use App\Helpers\ExceptionHelper;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
 
 /**
  * @property int id
@@ -26,7 +25,6 @@ class Category extends Model
     public function users() {
         return $this->belongsToMany(User::class, 'favorite_categories', 'category_id', 'user_id');
     }
-
 
     /**
      * Cerca di creare la categoria passata, se esiste già

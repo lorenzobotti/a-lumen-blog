@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
+use App\Exceptions\NotPremiumException;
+use App\Exceptions\NotYoursException;
+use App\Exceptions\ServerErrorException;
 use App\Helpers\ExceptionHelper;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
@@ -31,10 +35,9 @@ class PostController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-
         $title = $request->input('title');
         $content = $request->input('content');
-        /** @var string[] $categories */
+        /** @var string[]|null $categories */
         $categories = $request->input('categories');
 
         /** @var Post $post */
@@ -64,20 +67,23 @@ class PostController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+
         /** @var Post $post */
         $post = Post::find($id);
         if (!$post) {
-            return new Response('', 404);
+            //return new Response('', 404);
+            throw new NotFoundException();
         }
 
         $canDelete = $post->user_id == $user->id || $user->isMod();
         if (!$canDelete) {
-            return new Response('', 401);
+            // return new Response('', 401);
+            throw new NotYoursException();
         }
 
         $deleted = $post->delete();
         if (!$deleted) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
     }
 
@@ -86,7 +92,7 @@ class PostController extends Controller
         /** @var Post|null $post */
         $post = Post::with(['user', 'comments', 'comments.user', 'categories'])->find($id);
         if (!$post) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
 
@@ -111,7 +117,7 @@ class PostController extends Controller
         /** @var Post|null $post */
         $post = Post::find($id);
         if (!$post) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         $likes = $post->likes()->get();
@@ -129,25 +135,24 @@ class PostController extends Controller
         /** @var Post|null $post */
         $post = Post::find($id);
         if (!$post) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         $like = new PostLike();
         $like->user_id = $user->id;
         $like->post_id = $post->id;
 
-        /* TODO: secondo me esiste un modo meno verboso / più riutilizzabile
-         * per controllare se ci sono duplicati o meno */
         try {
             $saved = $like->save();
             if (!$saved) {
-                return new Response('', 500);
+                throw new ServerErrorException();
             }
         } catch (QueryException $e) {
             if (ExceptionHelper::isDuplicate($e)) {
+                // TODO: creare eccezione apposta
                 return new Response('', 409);
             } else {
-                return new Response('', 500);
+                throw new ServerErrorException();
             }
         }
     }
@@ -163,14 +168,14 @@ class PostController extends Controller
         /** @var PostLike|null $like */
         $like = PostLike::where('user_id', $user->id)->where('post_id', $id)->first();
         if (!$like) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         // TODO: se non metto forceDelete poi quando vado a rimettere il like
         // pensa che esista già.
         $deleted = $like->forceDelete();
         if (!$deleted) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
     }
 }
