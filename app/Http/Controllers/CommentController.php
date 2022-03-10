@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
+use App\Exceptions\NotYoursException;
+use App\Exceptions\ServerErrorException;
 use App\Helpers\ExceptionHelper;
 use App\Models\CommentLike;
 use App\Scopes\OwnerScope;
@@ -32,7 +35,7 @@ class CommentController extends Controller
 
         $saved = $comment->save();
         if (!$saved) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
 
         return $comment;
@@ -43,7 +46,7 @@ class CommentController extends Controller
         /** @var Comment|null $comment */
         $comment = Comment::with(['post', 'post.user', 'user', 'likes'])->find($id);
         if (!$comment) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         return $comment;
@@ -61,11 +64,11 @@ class CommentController extends Controller
         /** @var Comment|null $comment */
         $comment = Comment::find($id);
         if (!$comment) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         if (!$user->canEditOrDelete($comment)) {
-            return new Response('', 401);
+            throw new NotYoursException();
         }
 
 
@@ -82,16 +85,16 @@ class CommentController extends Controller
         /** @var Comment|null $comment */
         $comment = Comment::find($id);
         if (!$comment) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         if (!$user->canEditOrDelete($comment)) {
-            return new Response('', 401);
+            throw new NotYoursException();
         }
 
         $deleted = $comment->delete();
         if (!$deleted) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
     }
 
@@ -102,7 +105,7 @@ class CommentController extends Controller
         /** @var Comment|null $comment */
         $comment = Comment::find($id);
         if (!$comment) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         $like = new CommentLike();
@@ -112,13 +115,14 @@ class CommentController extends Controller
         try {
             $saved = $like->save();
             if (!$saved) {
-                return new Response('', 500);
+                throw new ServerErrorException();
             }
         } catch(QueryException $e) {
             if (ExceptionHelper::isDuplicate($e)) {
+                // TODO: eccezione apposta
                 return new Response('', 409);
             } else {
-                return new Response('', 500);
+                throw new ServerErrorException();
             }
         }
     }
@@ -131,12 +135,12 @@ class CommentController extends Controller
         /** @var CommmentLike|null $like */
         $like = CommentLike::where('user_id', $user->id)->where('comment_id', $id)->first();
         if (!$like) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         $deleted = $like->forceDelete();
         if (!$deleted) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
     }
 

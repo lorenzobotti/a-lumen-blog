@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
+use App\Exceptions\NotPremiumException;
+use App\Exceptions\ServerErrorException;
 use App\Helpers\ExceptionHelper;
 use App\Models\Category;
 use App\Models\Post;
@@ -24,7 +27,7 @@ class UserController extends Controller
         /** @var User|null $user */
         $user = User::with(['categories', 'posts'])->find($id);
         if (!$user) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         return $user;
@@ -43,12 +46,12 @@ class UserController extends Controller
         /** @var User $user */
         $user = User::where('email', $email)->first();
         if (!$user) {
-            return new Response($status = 404);
+            throw new NotFoundException();
         }
 
         $saved_password = $user->password;
         if (!password_verify($password, $saved_password)) {
-            return new Response('', 401);
+            throw new WrongCredentialsException();
         };
 
         return $user->api_token;
@@ -64,7 +67,7 @@ class UserController extends Controller
         $user->api_token = $newToken;
         $saved = $user->save();
         if (!$saved) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
 
         return $newToken;
@@ -76,19 +79,19 @@ class UserController extends Controller
         $banner = Auth::user();
 
         if (!$banner || !$banner->isMod()) {
-            return new Response('', 401);
+            throw new NotPremiumException();
         }
 
         /** @var User|null $banned */
         $banned = User::find($id);
         if (!$banned) {
-            return new Response('', 404);
+            throw new NotFoundException();
         }
 
         $banned->banned_at = new \DateTime();
         $saved = $banned->save();
         if (!$saved) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
     }
 
@@ -106,7 +109,7 @@ class UserController extends Controller
 
         $saved = $user->save();
         if (!$saved) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
         return $user;
     }
@@ -147,7 +150,7 @@ class UserController extends Controller
                 $user->categories()->save($category);
             } catch (QueryException $e) {
                 if (!ExceptionHelper::isDuplicate($e)) {
-                    return new Response('', 500);
+                    throw new ServerErrorException();
                 }
             }
         }

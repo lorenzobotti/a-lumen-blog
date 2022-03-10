@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\NotPremiumException;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Response;
@@ -21,7 +22,7 @@ class PremiumMiddleware
         /** @var User $user */
         $user = Auth::user();
         if (!in_array($user->subscription, ['premium', 'mod'], true)) {
-            return new Response('', 403);
+            throw new NotPremiumException();
         }
 
         return $next($request);
