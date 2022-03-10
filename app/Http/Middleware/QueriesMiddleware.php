@@ -21,8 +21,15 @@ class QueriesMiddleware
         $staging = getenv('APP_ENV') === 'local';
         // $staging = false;
 
-        DB::enableQueryLog();
+        if ($staging) {
+            DB::enableQueryLog();
+        }
+
         $res = $next($request);
+
+        if (!$staging) {
+            return $res;
+        }
         $queries = DB::getQueryLog();
 
         // per preservare lo status code originale
@@ -39,13 +46,9 @@ class QueriesMiddleware
             $content = $res->content();
         }
 
-        if ($staging) {
-            return new Response([
-                'response' => $content,
-                'queries' => $queries,
-            ], $status);
-        } else {
-            return $res;
-        }
+        return new Response([
+            'response' => $content,
+            'queries' => $queries,
+        ], $status);
     }
 }
