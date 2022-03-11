@@ -41,6 +41,8 @@ class CommentController extends Controller
         return $comment;
     }
 
+
+
     public function getCommentById(int $id)
     {
         /** @var Comment|null $comment */
@@ -118,10 +120,7 @@ class CommentController extends Controller
                 throw new ServerErrorException();
             }
         } catch(QueryException $e) {
-            if (ExceptionHelper::isDuplicate($e)) {
-                // TODO: eccezione apposta
-                return new Response('', 409);
-            } else {
+            if (!ExceptionHelper::isDuplicate($e)) {
                 throw new ServerErrorException();
             }
         }

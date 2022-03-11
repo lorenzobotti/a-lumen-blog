@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\NotFoundException;
+use App\Exceptions\NotLoggedException;
 use App\Exceptions\NotPremiumException;
 use App\Exceptions\NotYoursException;
 use App\Exceptions\ServerErrorException;
@@ -49,7 +50,7 @@ class PostController extends Controller
 
         $saved = $post->save();
         if (!$saved) {
-            return new Response('', 500);
+            throw new ServerErrorException();
         }
 
         if ($categories) {
@@ -71,13 +72,11 @@ class PostController extends Controller
         /** @var Post $post */
         $post = Post::find($id);
         if (!$post) {
-            //return new Response('', 404);
             throw new NotFoundException();
         }
 
         $canDelete = $post->user_id == $user->id || $user->isMod();
         if (!$canDelete) {
-            // return new Response('', 401);
             throw new NotYoursException();
         }
 
@@ -129,7 +128,7 @@ class PostController extends Controller
         /** @var User|null $user */
         $user = Auth::user();
         if (!$user) {
-            return new Response('', 401);
+            throw new NotLoggedException();
         }
 
         /** @var Post|null $post */
@@ -148,10 +147,7 @@ class PostController extends Controller
                 throw new ServerErrorException();
             }
         } catch (QueryException $e) {
-            if (ExceptionHelper::isDuplicate($e)) {
-                // TODO: creare eccezione apposta
-                return new Response('', 409);
-            } else {
+            if (!ExceptionHelper::isDuplicate($e)) {
                 throw new ServerErrorException();
             }
         }
@@ -162,7 +158,7 @@ class PostController extends Controller
         /** @var User|null $user */
         $user = Auth::user();
         if (!$user) {
-            return new Response('', 401);
+            throw new NotLoggedException();
         }
 
         /** @var PostLike|null $like */
